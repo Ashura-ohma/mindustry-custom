@@ -8,7 +8,8 @@ permissions:
   contents: read
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -20,14 +21,49 @@ jobs:
           git clone https://github.com/Anuken/Arc ../Arc
           git -C ../Arc checkout 8eb00ffff0126d0576c67df46f99b8f6bccd96fe
       - uses: gradle/actions/setup-gradle@v4
-      - name: Install Android platform
-        run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
-      - name: Test and build
-        run: ./gradlew tests:test android:assembleDebug -Pbuildversion=160.5
-      - uses: actions/upload-artifact@v4
         with:
-          name: Aurora-Frontier-debug-APK
-          path: android/build/outputs/apk/debug/*.apk
+          # Do not persist generated APKs via Gradle's build cache.
+          cache-disabled: true
+      - name: Install official Android command-line SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdk="$RUNNER_TEMP/aurora-android-sdk"
+          archive="$RUNNER_TEMP/android-commandlinetools.zip"
+          curl --fail --location --retry 3 \
+            https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip \
+            --output "$archive"
+          echo "7ec965280a073311c339e571cd5de778b9975026cfcbe79f2b1cdcb1e15317ee  $archive" | sha256sum --check
+          mkdir -p "$sdk/cmdline-tools"
+          unzip -q "$archive" -d "$sdk/cmdline-tools"
+          mv "$sdk/cmdline-tools/cmdline-tools" "$sdk/cmdline-tools/latest"
+          echo "ANDROID_HOME=$sdk" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$sdk" >> "$GITHUB_ENV"
+          echo "$sdk/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          # Only the approved SDK 36 packages; no unrelated --licenses sweep.
+          printf 'y\ny\ny\ny\n' > "$RUNNER_TEMP/android-sdk-answers"
+          "$sdk/cmdline-tools/latest/bin/sdkmanager" --sdk_root="$sdk" \
+            'platforms;android-36' 'build-tools;36.0.0' \
+            < "$RUNNER_TEMP/android-sdk-answers"
+          test -f "$sdk/platforms/android-36/android.jar"
+          test -x "$sdk/build-tools/36.0.0/aapt2"
+      # Separate processes release the sprite packer's native memory before R8.
+      - name: Pack full-quality sprites
+        run: ./gradlew --no-daemon --no-build-cache --max-workers=2 tools:pack -Pbuildversion=160.5
+      - name: Run engine tests
+        run: ./gradlew --no-daemon --no-build-cache --max-workers=1 tests:test -Pbuildversion=160.5
+      - name: Compile Android package (runner-local only)
+        run: ./gradlew --no-daemon --no-build-cache --max-workers=1 android:assembleDebug -x tools:pack -Pbuildversion=160.5
+      - name: Validate runner-local package
+        shell: bash
+        run: |
+          set -euo pipefail
+          apk=android/build/outputs/apk/debug/android-debug.apk
+          test -s "$apk"
+          unzip -tq "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify "$apk"
+          "$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$apk" | sed -n '1,8p'
+      # APKs are deliberately never uploaded as artifacts, releases or caches.
       - uses: actions/upload-artifact@v4
         if: always()
         with:

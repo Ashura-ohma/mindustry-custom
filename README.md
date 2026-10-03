@@ -17,7 +17,7 @@ Aurora custom units/buildings are available in the build menus without research 
 
 The release APK uses a separate package, `io.github.ashuraohma.aurorafrontier`, so it can coexist with official Mindustry. Android 5.0 (API 21) or newer; OpenGL ES 2.0 required. Native code is packaged for ARM64, ARMv7, x86 and x86_64. Device performance still depends on the hardware and map size.
 
-Download the APK supplied with the release, allow installation from the app used to open it, then launch **极光前线 / Aurora Frontier**. Keep the APK signing identity for updates; a differently signed build cannot replace this installation without uninstalling it. Back up saves before uninstalling.
+Use the separately supplied APK (Android packages are not published to GitHub), allow installation from the app used to open it, then launch **极光前线 / Aurora Frontier**. Keep the APK signing identity for updates; a differently signed build cannot replace this installation without uninstalling it. Back up saves before uninstalling.
 
 Custom content changes network compatibility. Automatic official community-server discovery is disabled in this fork. Direct/LAN multiplayer is intended for players using the same Aurora build. Do not use this build to join ordinary official servers. Original mod browsing remains optional; third-party mods are not guaranteed compatible.
 
@@ -43,9 +43,9 @@ The wrapper pins Gradle 9.3.1; the Android plugin is upgraded to 8.13.2 for the 
 
 On memory-constrained machines, use `scripts/build-aurora.sh` for a staged release build: it releases native image-packing memory before R8 runs.
 
-Output: `android/build/outputs/apk/debug/android-debug.apk`. To produce an unsigned release: `./gradlew android:assembleRelease -Pbuildversion=160.5`, then align/sign it with your own private Android signing key. Never commit a keystore or passwords. Release keys are intentionally outside this repository. A CI-built debug APK is for testing and will have a different signature from the delivered release.
+Output: `android/build/outputs/apk/debug/android-debug.apk`. To produce an unsigned release: `./gradlew android:assembleRelease -Pbuildversion=160.5`, then align/sign it with your own private Android signing key. Never commit a keystore or passwords. Release keys are intentionally outside this repository. CI builds a temporary debug APK only to validate compilation and packaging; it is never uploaded. Its debug signature differs from the separately delivered release.
 
-`tests:test` includes local upstream tests and focused Aurora content/challenge tests. The upstream Allure remote-mod integration test is opt-in (`aurora.externalModTests=true` in the test JVM) because it downloads and loads a third-party mod; it is excluded from the default offline-safe run. The GitHub workflow builds a separate debug artifact and publishes test reports. Passing headless tests and APK validation do not replace a device installation test.
+`tests:test` includes local upstream tests and focused Aurora content/challenge tests. The upstream Allure remote-mod integration test is opt-in (`aurora.externalModTests=true` in the test JVM) because it downloads and loads a third-party mod; it is excluded from the default offline-safe run. The GitHub workflow installs a checksum-pinned official Android command-line SDK, packs full-quality sprites, runs tests and validates a temporary debug APK in separate processes. Only test reports are published; APK artifact uploads, releases and Gradle cache uploads are disabled. Passing headless tests and APK validation do not replace a device installation test.
 
 ## License and attribution
 
