@@ -171,3 +171,7 @@ core/assets/logicids.dat
 
 # project files for the sectors
 core/assets-raw/sprites/ui/sectors/*.json
+# Private release signing material must never be committed.
+*.jks
+*.keystore
+keystore.properties

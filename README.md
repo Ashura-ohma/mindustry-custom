@@ -1,80 +1,54 @@
-![Logo](core/assets-raw/sprites/ui/logo.png)
+# 极光前线 · Aurora Frontier
 
-[![Build Status](https://github.com/Anuken/Mindustry/workflows/Tests/badge.svg?event=push)](https://github.com/Anuken/Mindustry/actions)
-[![Discord](https://img.shields.io/discord/391020510269669376.svg?logo=discord&logoColor=white&logoWidth=20&labelColor=7289DA&label=Discord&color=17cf48)](https://discord.gg/mindustry)  
+A clearly branded, unofficial **full Mindustry v160.5 fork**, built from source. Original Mindustry by Anuken and contributors is retained, including campaign, factory logistics, sandbox, map editor and local/custom-server multiplayer. This is not a WebView game or an APK repack.
 
-The automation tower defense RTS, written in Java.
+## 新内容 / New content
 
-_[Trello Board](https://trello.com/b/aE2tcUwF/mindustry-40-plans)_  
-_[Wiki](https://mindustrygame.github.io/wiki)_  
-_[Javadoc](https://mindustrygame.github.io/docs/)_ 
+- **极光挑战 / Aurora Challenge**: launch directly from the main menu; a deterministic snow valley defense scenario with 30 waves, a working starter economy and sample Aurora defenses.
+- **棱镜 / Prism**: powered piercing beam turret.
+- **星环 / Halo**: homing anti-air burst turret.
+- **霜棘 / Rime**: slowing/freezing artillery with differentiated ammunition.
+- **萤火 / Glimmer**: healing combat/support drone, built in the **极光无人机工厂 / Aurora Foundry**.
+- Chinese and English content descriptions; all original content is preserved.
 
-## Contributing
+Aurora custom units/buildings are available in the build menus without research prerequisites. Start with the dedicated challenge to see them in action. Factory units still require resources and power. You can continue building the normal mining, refining and transport economy during the challenge.
 
-See [CONTRIBUTING](CONTRIBUTING.md) for general code style and PR guidelines.
+## Android installation
 
-If you are a first-time contributor looking for features to implement or bugs to fix, see the issues tagged with 'candidate' [in the Mindustry-Suggestions repostiory](https://github.com/Anuken/Mindustry-Suggestions/issues?q=is%3Aissue%20state%3Aopen%20label%3Acandidate).
+The release APK uses a separate package, `io.github.ashuraohma.aurorafrontier`, so it can coexist with official Mindustry. Android 5.0 (API 21) or newer; OpenGL ES 2.0 required. Native code is packaged for ARM64, ARMv7, x86 and x86_64. Device performance still depends on the hardware and map size.
 
-## Building
+Download the APK supplied with the release, allow installation from the app used to open it, then launch **极光前线 / Aurora Frontier**. Keep the APK signing identity for updates; a differently signed build cannot replace this installation without uninstalling it. Back up saves before uninstalling.
 
-Bleeding-edge builds are generated automatically for every commit. You can see them [here](https://github.com/Anuken/MindustryBuilds/releases).
+Custom content changes network compatibility. Automatic official community-server discovery is disabled in this fork. Direct/LAN multiplayer is intended for players using the same Aurora build. Do not use this build to join ordinary official servers. Original mod browsing remains optional; third-party mods are not guaranteed compatible.
 
-If you'd rather compile on your own, follow these instructions.
-First, make sure you have [JDK 17](https://adoptium.net/temurin/releases/?os=any&arch=any&version=17) installed. **Other JDK versions will not work.** Open a terminal in the Mindustry directory and run the following commands:
+## Build from corresponding source
 
-### Windows
+Pinned upstream: `Anuken/Mindustry` tag `v160.5`, commit `067c720a8817c1c9fb586c03898a7d948caaed56`.
 
-_Running:_ `gradlew desktop:run`  
-_Building:_ `gradlew desktop:dist`  
-_Sprite Packing:_ `gradlew tools:pack`
+Requirements:
 
-### Linux/Mac OS
+1. JDK 17 (Temurin works).
+2. Android command-line SDK, platform `android-36`, build-tools `36.0.0`; review and accept Google's SDK terms yourself.
+3. A checkout of the pinned Arc source **next to this directory**:
 
-_Running:_ `./gradlew desktop:run`  
-_Building:_ `./gradlew desktop:dist`  
-_Sprite Packing:_ `./gradlew tools:pack`
+```sh
+git clone https://github.com/Anuken/Arc ../Arc
+git -C ../Arc checkout 8eb00ffff0126d0576c67df46f99b8f6bccd96fe
+export JAVA_HOME=/path/to/jdk-17
+export ANDROID_HOME=/path/to/android-sdk
+./gradlew tests:test android:assembleDebug -Pbuildversion=160.5
+```
 
-### Server
+The wrapper pins Gradle 9.3.1; the Android plugin is upgraded to 8.13.2 for the SDK 36 build. Dependencies remain pinned in the build files. Arc includes the native binaries and corresponding native sources/build definitions. No NDK rebuild is needed for the supplied native artifacts.
 
-Server builds are bundled with each released build (in Releases). If you'd rather compile on your own, replace 'desktop' with 'server', e.g. `gradlew server:dist`.
+On memory-constrained machines, use `scripts/build-aurora.sh` for a staged release build: it releases native image-packing memory before R8 runs.
 
-### Android
+Output: `android/build/outputs/apk/debug/android-debug.apk`. To produce an unsigned release: `./gradlew android:assembleRelease -Pbuildversion=160.5`, then align/sign it with your own private Android signing key. Never commit a keystore or passwords. Release keys are intentionally outside this repository. A CI-built debug APK is for testing and will have a different signature from the delivered release.
 
-1. Install the Android SDK [here.](https://developer.android.com/studio#command-tools) Make sure you're downloading the "Command line tools only", as Android Studio is not required.
-2. In the unzipped Android SDK folder, find the cmdline-tools directory. Then create a folder inside of it called `latest` and put all of its contents into the newly created folder.
-3. In the same directory run the command `sdkmanager --licenses` (or `./sdkmanager --licenses` if on linux/mac)
-4. Set the `ANDROID_HOME` environment variable to point to your unzipped Android SDK directory.
-5. Enable developer mode on your device/emulator. If you are on testing on a phone you can follow [these instructions](https://developer.android.com/studio/command-line/adb#Enabling), otherwise you need to google how to enable your emulator's developer mode specifically.
-6. Run `gradlew android:assembleDebug` (or `./gradlew` if on linux/mac). This will create an unsigned APK in `android/build/outputs/apk`.
+`tests:test` includes local upstream tests and focused Aurora content/challenge tests. The upstream Allure remote-mod integration test is opt-in (`aurora.externalModTests=true` in the test JVM) because it downloads and loads a third-party mod; it is excluded from the default offline-safe run. The GitHub workflow builds a separate debug artifact and publishes test reports. Passing headless tests and APK validation do not replace a device installation test.
 
-To debug the application on a connected device/emulator, run `gradlew android:installDebug android:run`.
+## License and attribution
 
-### Troubleshooting
+The original [GPL-3.0 license](LICENSE) is preserved and applies to this fork's code. See [README-UPSTREAM.md](README-UPSTREAM.md), the in-game credits and [THIRD_PARTY.md](THIRD_PARTY.md) for attribution and dependency notices. New Aurora code/icon are also supplied under GPL-3.0. Mindustry's original authors do not endorse this fork.
 
-#### Permission Denied
-
-If the terminal returns `Permission denied` or `Command not found` on Mac/Linux, run `chmod +x ./gradlew` before running `./gradlew`. *This is a one-time procedure.*
-
-#### Where is the `mindustry.gen` package?
-
-As the name implies, `mindustry.gen` is generated *at build time* based on other code. You will not find source code for this package in the repository, and it should not be edited by hand.
-
-The following is a non-exhaustive list of the "source" of generated code in `mindustry.gen`:
-
-- `Call`, `*Packet` classes: Generated from methods marked with `@Remote`.
-- All entity classes (`Unit`, `EffectState`, `Posc`, etc): Generated from component classes in the `mindustry.entities.comp` package, and combined using definitions in `mindustry.content.UnitTypes`.
-- `Sounds`, `Musics`, `Tex`, `Icon`, etc: Generated based on files in the respective asset folders.
-
----
-
-Gradle may take up to several minutes to download files. Be patient. <br>
-After building, the output .JAR file should be in `/desktop/build/libs/Mindustry.jar` for desktop builds, and in `/server/build/libs/server-release.jar` for server builds.
-
-## Feature Requests
-
-Post feature requests and feedback [here](https://github.com/Anuken/Mindustry-Suggestions/issues/new/choose).
-
-## Downloads
-
-| [![](https://static.itch.io/images/badge.svg)](https://anuke.itch.io/mindustry)    |    [![](https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png)](https://play.google.com/store/apps/details?id=io.anuke.mindustry)   |    [![](https://fdroid.gitlab.io/artwork/badge/get-it-on.png)](https://f-droid.org/packages/io.anuke.mindustry)	| [![](https://flathub.org/assets/badges/flathub-badge-en.svg)](https://flathub.org/apps/details/com.github.Anuken.Mindustry)  
-|---	|---	|---	|---	|
+The repository contains corresponding source and build instructions for the distributed APK, with pinned external source dependencies. Original asset attributions and credits are retained. Please report fork-specific problems in this repository rather than to upstream Mindustry.

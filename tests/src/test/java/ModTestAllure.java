@@ -13,6 +13,8 @@ import static org.junit.jupiter.api.Assertions.*;
 //- it is probably the mod with the most json, and as such covers a lot of classes
 //- it is popular enough in the mod browser
 //- I am somewhat familiar with its files & the type of content it adds
+// Opt in explicitly: this downloads and loads a third-party mod over the network.
+@org.junit.jupiter.api.condition.EnabledIfSystemProperty(named = "aurora.externalModTests", matches = "true")
 public class ModTestAllure extends GenericModTest{
 
     @Test

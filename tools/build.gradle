@@ -43,6 +43,11 @@ tasks.register('tileImages'){
 
 tasks.register('pack'){
     dependsOn = [classes, configurations.runtimeClasspath]
+    inputs.dir('../core/assets-raw/sprites')
+    inputs.files(project(':core').sourceSets.main.allSource)
+    inputs.files(sourceSets.main.allSource)
+    outputs.files(fileTree('../core/assets/sprites'){ include 'sprites*', 'fallback/**', 'block_colors.png' })
+    outputs.file('../core/build/last_pack_version')
 
     doLast{
         //cleanup old sprites

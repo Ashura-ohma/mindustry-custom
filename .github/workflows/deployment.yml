@@ -8,6 +8,7 @@ on:
 permissions: {}
 jobs:
   deploy:
+    if: github.repository == 'Anuken/Mindustry'
     permissions:
       contents: write # for release creation (svenstaro/upload-release-action)
 

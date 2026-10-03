@@ -74,7 +74,7 @@ public class Vars implements Loadable{
     /** global charset, since Android doesn't support the Charsets class */
     public static final Charset charset = Charset.forName("UTF-8");
     /** main application name, capitalized */
-    public static final String appName = "Mindustry";
+    public static final String appName = "AuroraFrontier";
     /** Github API URL. */
     public static final String ghApi = "https://api.github.com";
     /** URL for discord invite. */
@@ -92,7 +92,7 @@ public class Vars implements Loadable{
     /** URLs to the JSON file containing players banned from Steam. */
     public static final String[] steamBansURLs = {"https://raw.githubusercontent.com/Anuken/MindustrySteamBans/master/data.json", "https://cdn.jsdelivr.net/gh/anuken/mindustrysteambans/data.json"};
     /** URL of the github issue report template. */
-    public static final String reportIssueURL = "https://github.com/Anuken/Mindustry/issues/new?labels=bug&template=bug_report.md";
+    public static final String reportIssueURL = "https://github.com/Ashura-ohma/mindustry-custom/issues";
     /** list of built-in servers.*/
     public static final Seq<ServerGroup> defaultServers = Seq.with();
     /** cached server list - only used if defaultServers have not been fetched */

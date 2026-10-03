@@ -553,7 +553,7 @@ public class Generators{
         });
 
         generate("unit-icons", () -> content.units().each(type -> {
-            if(type.internal && !type.internalGenerateSprites) return; //internal hidden units don't generate
+            if(!type.generateIcons || (type.internal && !type.internalGenerateSprites)) return; // Atlas-alias units reuse existing sprites.
 
             ObjectSet<String> outlined = new ObjectSet<>();
 

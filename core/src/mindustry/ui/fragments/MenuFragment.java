@@ -16,6 +16,7 @@ import arc.struct.*;
 import arc.util.*;
 import mindustry.core.*;
 import mindustry.game.EventType.*;
+import mindustry.game.AuroraChallenge;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.ui.*;
@@ -111,7 +112,7 @@ public class MenuFragment{
 
         String versionText = ((Version.build == -1) ? "[#fc8140aa]" : "[#ffffffba]") + Version.combined();
         parent.fill((x, y, w, h) -> {
-            TextureRegion logo = Core.atlas.find("logo");
+            TextureRegion logo = Core.atlas.find("aurora-logo");
             float width = Core.graphics.getWidth(), height = Core.graphics.getHeight() - Core.scene.marginTop;
             float logoscl = Scl.scl(1) * logo.scale;
             float logow = Math.min(logo.width * logoscl, Core.graphics.getWidth() - Scl.scl(20));
@@ -154,6 +155,7 @@ public class MenuFragment{
 
         if(!Core.graphics.isPortrait()){
             container.marginTop(60f);
+            container.button("@aurora.challenge.menu", Icon.play, () -> checkPlay(AuroraChallenge::show)).colspan(4).width(510f).height(64f).row();
             container.add(play);
             container.add(join);
             container.add(custom);
@@ -174,6 +176,7 @@ public class MenuFragment{
             container.add(ios ? about : exit);
         }else{
             container.marginTop(0f);
+            container.button("@aurora.challenge.menu", Icon.play, () -> checkPlay(AuroraChallenge::show)).colspan(2).width(250f).height(64f).row();
             container.add(play);
             container.add(maps);
             container.row();
@@ -208,6 +211,7 @@ public class MenuFragment{
 
             if(desktopButtons == null){
                 desktopButtons = Seq.with(
+                    new MenuButton("@aurora.challenge.menu", Icon.play, () -> checkPlay(AuroraChallenge::show)),
                     new MenuButton("@play", Icon.play,
                         new MenuButton("@campaign", Icon.play, () -> checkPlay(ui.planet::show)),
                         new MenuButton("@joingame", Icon.add, () -> checkPlay(ui.join::show)),

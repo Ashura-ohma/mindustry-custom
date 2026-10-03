@@ -6,7 +6,7 @@ buildscript{
     }
 
     dependencies{
-        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath 'com.android.tools.build:gradle:8.13.2'
     }
 }
 
@@ -57,9 +57,9 @@ android{
     defaultConfig{
         Properties props = loadVersionProps()
         Integer vcode = props['androidBuildCode']?.toInteger() ?: 1
-        def versionNameResult = "$versionNumber-$versionType-${getBuildVersion().replace(" ", "-")}"
+        def versionNameResult = "1.0.0-aurora-v160.5"
 
-        applicationId "io.anuke.mindustry"
+        applicationId "io.github.ashuraohma.aurorafrontier"
         minSdkVersion 21
         targetSdkVersion 36
 
@@ -131,14 +131,8 @@ dependencies{
         natives "com.github.Anuken.Arc:natives-freetype-android:$arcHash"
     }
 
-    def version, highestVersion
-    new File((String)findSdkDir(), "/platforms").eachFileMatch ~/android-\d+/, {
-        version = it.name.find(/\d+/).toInteger()
-        highestVersion = version > highestVersion ? version : highestVersion
-    }
+    // AGP supplies android.jar; adding it as compileOnly duplicates the boot classpath.
 
-    def sdkFile = new File((String)findSdkDir(), "/platforms/android-${highestVersion}/android.jar")
-    if(sdkFile.exists()) compileOnly files(sdkFile.absolutePath)
 }
 
 task copyAndroidNatives(){
@@ -162,5 +156,13 @@ if(!project.ext.hasSprites()){
         if(task.name == 'assembleDebug' || task.name == 'assembleRelease'){
             task.dependsOn ":tools:pack"
         }
+    }
+}
+
+// A clean Android build must pack the atlas before assets are merged, not merely
+// before assemble completes (which permits parallel merge/pack races).
+tasks.configureEach{ task ->
+    if(task.name == 'mergeDebugAssets' || task.name == 'mergeReleaseAssets'){
+        task.dependsOn ':tools:pack'
     }
 }

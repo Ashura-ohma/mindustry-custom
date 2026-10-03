@@ -211,3 +211,6 @@ platforms.each{ platform ->
 
     }
 }
+
+// Always generate the atlas before constructing a source-built distribution.
+dist.dependsOn ':tools:pack'

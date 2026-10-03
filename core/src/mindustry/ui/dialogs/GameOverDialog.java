@@ -58,7 +58,9 @@ public class GameOverDialog extends BaseDialog{
         buttons.margin(10);
 
         cont.table(t -> {
-            if(state.rules.pvp && winner != null){
+            if("1".equals(state.rules.tags.get("aurora-challenge"))){
+                t.add(winner == state.rules.defaultTeam ? "@aurora.challenge.victory" : "@aurora.challenge.defeat").center().pad(6);
+            }else if(state.rules.pvp && winner != null){
                 t.add(Core.bundle.format("gameover.pvp", winner.coloredName())).center().pad(6);
             }else{
                 t.add(state.isCampaign() ? Core.bundle.format("sector.lost", state.getSector().name()) : "@gameover").center().pad(6);
@@ -76,7 +78,8 @@ public class GameOverDialog extends BaseDialog{
                 p.setBackground(Styles.black3);
 
                 p.table(stats -> {
-                    if(state.rules.waves) addStat(stats, Core.bundle.get("stats.wave"), state.stats.wavesLasted, 0f);
+                    if(state.rules.waves) addStat(stats, Core.bundle.get("stats.wave"),
+                        "1".equals(state.rules.tags.get("aurora-challenge")) ? Math.min(state.stats.wavesLasted, AuroraChallenge.waves) : state.stats.wavesLasted, 0f);
                     addStat(stats, Core.bundle.get("stats.unitsCreated"), state.stats.unitsCreated, 0.05f);
                     addStat(stats, Core.bundle.get("stats.enemiesDestroyed"), state.stats.enemyUnitsDestroyed, 0.1f);
                     addStat(stats, Core.bundle.get("stats.built"), state.stats.buildingsBuilt, 0.15f);

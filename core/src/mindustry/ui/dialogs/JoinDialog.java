@@ -700,6 +700,8 @@ public class JoinDialog extends BaseDialog{
     }
 
     public static void fetchServers(){
+        // Custom content changes network IDs: use direct/LAN connections to matching forks only.
+        if(Version.type.equals("aurora")) return;
         var urls = Version.type.equals("bleeding-edge") || Vars.forceBeServers ? serverJsonBeURLs : serverJsonURLs;
 
         if(Core.settings.getBool("communityservers", true)){

@@ -1129,7 +1129,10 @@ public class HudFragment{
                 return builder;
             }
 
-            if(state.rules.winWave > 1 && state.rules.winWave >= state.wave){
+            if("1".equals(state.rules.tags.get("aurora-challenge"))){
+                int current = state.wave - (state.enemies > 0 || spawner.isSpawning() ? 1 : 0);
+                builder.append(wavefc.get(Mathf.clamp(current, 1, AuroraChallenge.waves), AuroraChallenge.waves));
+            }else if(state.rules.winWave > 1 && state.rules.winWave >= state.wave){
                 builder.append(wavefc.get(state.wave, state.rules.winWave));
             }else{
                 builder.append(wavef.get(state.wave));

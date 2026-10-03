@@ -40,6 +40,9 @@ public class AboutDialog extends BaseDialog{
         Table in = new Table();
         ScrollPane pane = new ScrollPane(in);
 
+        in.add("[accent]Aurora Frontier / 极光前线[]\nUnofficial Mindustry v160.5 fork · GPL-3.0\nOriginal game by Anuken and contributors").width(w).wrap().pad(14).row();
+        in.button("Fork source / 改版源码", Icon.link, () -> Core.app.openURI("https://github.com/Ashura-ohma/mindustry-custom")).width(w).height(55f).row();
+
         for(LinkEntry link : Links.getLinks()){
             if((ios || steam) && bannedItems.contains(link.name)){
                 continue;
